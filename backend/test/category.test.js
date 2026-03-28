@@ -5,7 +5,7 @@ const baseURL = "http://localhost:5001";
 describe('Category API test', () => {
   it('should be able to successfully create a category', async () => {
     const newCategory = {
-      category_name: "Programming",
+      category_name: "Programming" + Date.now(),
       description: "Software development and coding workshops"
     };
 
@@ -28,14 +28,14 @@ describe('Category API test', () => {
 describe('Category API test', () => {
   it('should be able to update an existing category', async () => {
     const categoryToUpdate = {
-      category_name: "Initial Name",
+      category_name: "Initial Name" + Date.now(),
       description: "Initial Description"
     };
     const createRes = await request(baseURL).post('/api/categories').send(categoryToUpdate);
     const categoryId = createRes.body._id;
 
     const updatedData = {
-      category_name: "Programming",
+      category_name: "Programming" + Date.now(),
       description: "Software development and coding workshops"
     };
 
