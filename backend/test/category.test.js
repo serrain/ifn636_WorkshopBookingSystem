@@ -46,3 +46,18 @@ describe('Category API test', () => {
     expect(response.statusCode).toBe(200);
   });
 });
+
+describe('Category API test', () => {
+  it('should be able to delete a category', async () => {
+    const categoryToDelete = { 
+      category_name: "Initial Name" + Date.now(), 
+      description: "Initial Description" 
+    };
+    const createRes = await request(baseURL).post('/api/categories').send(categoryToDelete);
+    const categoryId = createRes.body._id;
+
+    const response = await request(baseURL).delete(`/api/categories/${categoryId}`);
+
+    expect(response.statusCode).toBe(200); 
+  });
+});
