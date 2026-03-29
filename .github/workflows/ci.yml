@@ -1,28 +1,38 @@
 name: CI
 
 on:
-    push:
-        branches: [ "main", "develop" ]
-    pull_request:
-        branches: [ "main", "develop" ]
+  push:
+    branches: [ "main", "develop", "fix/ci" ]
+  pull_request:
+    branches: [ "main", "develop" ]
 
 jobs:
-    build:
-        runs-on: ubuntu-latest
+  build:
+    runs-on: ubuntu-latest
 
-        steps:
-          - name: Checkout code
-            uses: actions/checkout@v4
+    services:
+      mongodb:
+        image: mongo:latest
+        ports:
+          - 27017:27017
 
-          - name: Set up Node.js
-            uses: actions/setup-node@v4
-            with:
-                node-version: '20'
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
 
-          - name: Install dependencies
-            run: npm install
-            working-directory: ./backend
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
 
-          - name: Run tests
-            run: npm test
-            working-directory: ./backend
+      - name: Install dependencies
+        run: npm install
+        working-directory: ./backend
+
+      - name: Run tests
+        working-directory: ./backend
+        env:
+          MONGO_URI: mongodb://localhost:27017/IFN636_TestDB
+          PORT: 5001
+          JWT_SECRET: ${{ secrets.JWT_SECRET || 'test_secret_key' }}
+        run: npm test
