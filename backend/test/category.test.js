@@ -5,6 +5,17 @@ const mongoose = require('mongoose');
 beforeAll(async () => {
     const url = process.env.MONGO_URI || 'mongodb://localhost:27017/test';
     await mongoose.connect(url);
+
+    await User.deleteMany({ email: "admin1@test.com" });
+    const bcrypt = require('bcryptjs');
+    const hashedPassword = await bcrypt.hash("123456", 10);
+    
+    await User.create({
+        username: "AdminUser",
+        email: "admin1@test.com",
+        password: hashedPassword,
+        role: "admin"
+    });
 });
 
 describe('Category API test', () => {
