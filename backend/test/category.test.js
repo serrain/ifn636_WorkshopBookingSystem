@@ -1,6 +1,7 @@
 const request = require('supertest');
 const app = require('../server');
 const mongoose = require('mongoose');
+const User = require('../models/User');
 
 beforeAll(async () => {
     const url = process.env.MONGO_URI || 'mongodb://localhost:27017/test';
