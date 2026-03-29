@@ -8,13 +8,11 @@ beforeAll(async () => {
     await mongoose.connect(url);
 
     await User.deleteMany({ email: "admin1@test.com" });
-    const bcrypt = require('bcryptjs');
-    const hashedPassword = await bcrypt.hash("123456", 10);
     
     await User.create({
-        username: "AdminUser",
+        name: "admin1",
         email: "admin1@test.com",
-        password: hashedPassword,
+        password: "123456",
         role: "admin"
     });
 });
