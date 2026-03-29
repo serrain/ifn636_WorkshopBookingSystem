@@ -1,6 +1,6 @@
 const request = require('supertest');
 
-const baseURL = "http://13.54.220.72:5001";
+const baseURL = "http://localhost:5001";
 
 describe('Category API test', () => {
   it('should be able to successfully create a category', async () => {
