@@ -1,12 +1,17 @@
 const request = require('supertest');
+const app = require('../server');
+const mongoose = require('mongoose');
 
-const baseURL = "http://localhost:5001";
+beforeAll(async () => {
+    const url = process.env.MONGO_URI || 'mongodb://localhost:27017/test';
+    await mongoose.connect(url);
+});
 
 describe('Category API test', () => {
     let adminToken;
 
     beforeAll(async () => {
-        const loginRes = await request(baseURL)
+        const loginRes = await request(app)
             .post('/api/auth/login')
             .send({
                 email: "admin1@test.com",
@@ -22,7 +27,7 @@ describe('Category API test', () => {
             description: "Software development and coding workshops"
         };
 
-        const response = await request(baseURL)
+        const response = await request(app)
             .post('/api/categories')
             .set('Authorization', `Bearer ${adminToken}`)
             .send(newCategory);
@@ -34,7 +39,7 @@ describe('Category API test', () => {
 
 
     it('should be able to successfully get the category list', async () => {
-        const response = await request(baseURL).get('/api/categories');
+        const response = await request(app).get('/api/categories');
         expect(response.statusCode).toBe(200);
     });
 
@@ -45,7 +50,7 @@ describe('Category API test', () => {
             category_name: "Initial Name" + Date.now(),
             description: "Initial Description"
         };
-        const createRes = await request(baseURL)
+        const createRes = await request(app)
             .post('/api/categories')
             .set('Authorization', `Bearer ${adminToken}`)
             .send(categoryToUpdate);
@@ -56,7 +61,7 @@ describe('Category API test', () => {
             description: "Software development and coding workshops"
         };
 
-        const response = await request(baseURL)
+        const response = await request(app)
             .put(`/api/categories/${categoryId}`)
             .set('Authorization', `Bearer ${adminToken}`)
             .send(updatedData);
@@ -71,16 +76,20 @@ describe('Category API test', () => {
             category_name: "Initial Name" + Date.now(),
             description: "Initial Description"
         };
-        const createRes = await request(baseURL)
+        const createRes = await request(app)
             .post('/api/categories')
             .set('Authorization', `Bearer ${adminToken}`)
             .send(categoryToDelete);
         const categoryId = createRes.body._id;
 
-        const response = await request(baseURL)
+        const response = await request(app)
             .delete(`/api/categories/${categoryId}`)
             .set('Authorization', `Bearer ${adminToken}`);
 
         expect(response.statusCode).toBe(200);
     });
+});
+
+afterAll(async () => {
+    await mongoose.connection.close();
 });
