@@ -2,7 +2,7 @@ name: CI
 
 on:
   push:
-    branches: [ "main", "develop", "fix/ci" ]
+    branches: [ "main", "develop", "fix/test" ]
   pull_request:
     branches: [ "main", "develop" ]
 
@@ -26,10 +26,10 @@ jobs:
           node-version: '20'
 
       - name: Install dependencies
-        run: npm install
         working-directory: ./backend
+        run: npm ci 
 
-      - name: Run tests
+      - name: Run Backend Tests
         working-directory: ./backend
         env:
           MONGO_URI: mongodb://localhost:27017/IFN636_TestDB
