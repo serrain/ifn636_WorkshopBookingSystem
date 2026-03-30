@@ -39,6 +39,6 @@ jobs:
 
       - name: Deploy and Restart
         working-directory: ./backend
-        run: 
+        run: |
           npm install
           pm2 restart all
