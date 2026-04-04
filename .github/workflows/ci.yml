@@ -44,9 +44,6 @@ jobs:
           cd ./backend
           touch .env
           echo "${{ secrets.PROD }}" > .env
-          
-          npm ci
-          pm2 restart all
         
       - name: Start Services
         working-directory: ./backend
