@@ -1,28 +1,52 @@
 name: CI
 
 on:
-    push:
-        branches:
-            - main
-    pull_request:
-        branches:
-            - main
+  push:
+    branches: [ "main", "develop", "feature/frontend" ]
+  pull_request:
+    branches: [ "main", "develop" ]
 
 jobs:
-    build:
-        runs-on: ubuntu-latest
+  build:
+    runs-on: self-hosted
 
-        steps:
-        - name: Checkout code
-            uses: actions/checkout@v2
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
 
-        - name: Set up Node.js
-            uses: actions/setup-node@v2
-            with:
-                node-version: '14'
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
 
-        - name: Install dependencies
-            run: npm install
+      - name: Install dependencies
+        working-directory: ./backend
+        run: npm install
 
-        - name: Run tests
-            run: npm test
+      - name: Install frontend dependencies and build
+        working-directory: ./frontend
+        run: |
+          export NODE_OPTIONS="--max-old-space-size=1024"
+          sudo rm -rf ./build
+          npm ci
+          npm run build
+
+      - name: Run Backend Tests
+        working-directory: ./backend
+        env:
+          MONGO_URI: ${{ secrets.MONGO_URI }}
+          PORT: ${{ secrets.PORT }}
+          JWT_SECRET: ${{ secrets.JWT_SECRET }}
+        run: npm test
+
+      - name: Create .env file
+        run: |
+          cd ./backend
+          touch .env
+          echo "${{ secrets.PROD }}" > .env
+        
+      - name: Start Services
+        working-directory: ./backend
+        run: |
+          pm2 restart backend || pm2 start server.js --name "backend"
+          pm2 save
