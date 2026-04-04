@@ -26,8 +26,9 @@ jobs:
       - name: Install frontend dependencies and build
         working-directory: ./frontend
         run: |
+          export NODE_OPTIONS="--max-old-space-size=1024"
           sudo rm -rf ./build
-          npm install
+          npm ci
           npm run build
 
       - name: Run Backend Tests
