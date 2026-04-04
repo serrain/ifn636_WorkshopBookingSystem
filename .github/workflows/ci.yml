@@ -2,7 +2,7 @@ name: CI
 
 on:
   push:
-    branches: [ "main", "develop", "fix/cd" ]
+    branches: [ "main", "develop", "feature/frontend" ]
   pull_request:
     branches: [ "main", "develop" ]
 
@@ -21,22 +21,32 @@ jobs:
 
       - name: Install dependencies
         working-directory: ./backend
-        run: npm ci 
+        run: npm install
+
+      - name: Install frontend dependencies and build
+        working-directory: ./frontend
+        run: |
+          export NODE_OPTIONS="--max-old-space-size=1024"
+          sudo rm -rf ./build
+          npm ci
+          npm run build
 
       - name: Run Backend Tests
         working-directory: ./backend
         env:
-          MONGO_URI: mongodb://localhost:27017/IFN636_TestDB
-          PORT: 5001
-          JWT_SECRET: ${{ secrets.JWT_SECRET || 'test_secret_key' }}
+          MONGO_URI: ${{ secrets.MONGO_URI }}
+          PORT: ${{ secrets.PORT }}
+          JWT_SECRET: ${{ secrets.JWT_SECRET }}
         run: npm test
 
-      - name: Deploy and Restart
+      - name: Create .env file
+        run: |
+          cd ./backend
+          touch .env
+          echo "${{ secrets.PROD }}" > .env
+        
+      - name: Start Services
         working-directory: ./backend
         run: |
-          echo "MONGO_URI=mongodb://localhost:27017/IFN636_ProdDB" > .env
-          echo "PORT=5001" >> .env
-          echo "JWT_SECRET=${{ secrets.JWT_SECRET }}" >> .env
-          
-          npm ci
-          pm2 restart all
+          pm2 restart backend || pm2 start server.js --name "backend"
+          pm2 save
