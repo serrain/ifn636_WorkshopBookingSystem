@@ -2,19 +2,13 @@ name: CI
 
 on:
   push:
-    branches: [ "main", "develop", "fix/test" ]
+    branches: [ "main", "develop", "fix/cd" ]
   pull_request:
     branches: [ "main", "develop" ]
 
 jobs:
   build:
-    runs-on: ubuntu-latest
-
-    services:
-      mongodb:
-        image: mongo:latest
-        ports:
-          - 27017:27017
+    runs-on: self-hosted
 
     steps:
       - name: Checkout code
@@ -36,3 +30,13 @@ jobs:
           PORT: 5001
           JWT_SECRET: ${{ secrets.JWT_SECRET || 'test_secret_key' }}
         run: npm test
+
+      - name: Deploy and Restart
+        working-directory: ./backend
+        run: |
+          echo "MONGO_URI=mongodb://localhost:27017/IFN636_ProdDB" > .env
+          echo "PORT=5001" >> .env
+          echo "JWT_SECRET=${{ secrets.JWT_SECRET }}" >> .env
+          
+          npm ci
+          pm2 restart all
