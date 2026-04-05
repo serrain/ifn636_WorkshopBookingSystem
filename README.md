@@ -48,10 +48,8 @@ This project is a Workshop Booking Management System designed to allow users to 
 git clone (https://github.com/serrain/ifn636_WorkshopBookingSystem.git)
 
 2. Install dependencies
-# backend
-npm install
-# frontend
-npm install
+(backend) npm install
+(frontend) npm install
 
 3. Create a .env file in the backend folder:
 PORT=5001
@@ -59,10 +57,8 @@ MONGO_URI=your_mongodb_connection_string
 JWT_SECRET=your_secret_key
 
 4. Run the project
-# start backend
-npm server.js
-# start frontend
-npm start
+(start backend) npm server.js
+(start frontend) npm start
 
 
 ## Author
